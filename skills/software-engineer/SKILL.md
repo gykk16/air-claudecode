@@ -40,5 +40,7 @@ Task(subagent_type="air-claudecode:software-engineer", model="opus", prompt="{{A
 2. **Plan** -- identify files to change, decide approach (simplest solution that works)
 3. **Implement** -- write clean, human-readable code following project conventions
 4. **Verify** -- check compilation, review changes for clean code compliance
+5. **Test** -- invoke `/air-claudecode:test-engineer` to generate tests
+6. **Review** -- invoke `/air-claudecode:code-review` on the changed files
 
 Task: {{ARGUMENTS}}
