@@ -33,6 +33,7 @@ const SKILL_KEYWORDS = {
     "git-issue-master": ["git issue", "github issue", "깃 이슈", "깃헙 이슈", "이슈 만들", "이슈 생성", "create issue", "file issue", "open issue"],
     "jira-master": ["jira", "지라", "티켓 만들", "티켓 생성", "티켓 조회", "티켓 수정", "jira ticket", "jira issue"],
     "setup": ["setup", "설정", "설치 확인", "configure air", "air-claudecode setup"],
+    "code-review": ["code review", "코드 리뷰", "리뷰해", "review this", "pr review", "코드리뷰"],
 };
 
 /**
