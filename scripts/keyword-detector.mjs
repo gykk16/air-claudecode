@@ -1,0 +1,135 @@
+#!/usr/bin/env node
+
+/**
+ * UserPromptSubmit hook: detects skill/agent keywords in user prompts
+ * and suggests the corresponding skill or agent.
+ */
+
+import {readFile} from "node:fs/promises";
+import {dirname, join} from "node:path";
+import {fileURLToPath} from "node:url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const PLUGIN_ROOT = process.env.CLAUDE_PLUGIN_ROOT || join(__dirname, "..");
+const AGENTS_DIR = join(PLUGIN_ROOT, "agents");
+
+async function readStdin() {
+    const chunks = [];
+    for await (const chunk of process.stdin) {
+        chunks.push(chunk);
+    }
+    return Buffer.concat(chunks).toString();
+}
+
+/**
+ * Skill keyword mapping.
+ * Each key is a skill name, values are trigger keywords.
+ * Skills are invoked via /air-claudecode:<skill-name>.
+ */
+const SKILL_KEYWORDS = {
+    "git-commit": ["commit", "커밋", "커밋해", "commit this", "커밋 만들"],
+    "git-branch": ["create branch", "브랜치 만들", "branch from", "new branch", "브랜치 생성"],
+    "git-pr-master": ["pr", "pr 만들", "pr 생성", "create pr", "open pr", "merge pr", "pull request", "풀 리퀘스트"],
+    "git-issue-master": ["git issue", "github issue", "깃 이슈", "깃헙 이슈", "이슈 만들", "이슈 생성", "create issue", "file issue", "open issue"],
+    "jira-master": ["jira", "지라", "티켓 만들", "티켓 생성", "티켓 조회", "티켓 수정", "jira ticket", "jira issue"],
+    "setup": ["setup", "설정", "설치 확인", "configure air", "air-claudecode setup"],
+};
+
+/**
+ * Agent keyword mapping (for agents without a matching skill).
+ */
+const AGENT_KEYWORDS = {
+    // Currently all agents have matching skills, add agent-only entries here if needed
+};
+
+function detectSkill(userPrompt) {
+    const lower = userPrompt.toLowerCase();
+    for (const [skill, keywords] of Object.entries(SKILL_KEYWORDS)) {
+        for (const keyword of keywords) {
+            if (lower.includes(keyword.toLowerCase())) {
+                return {type: "skill", name: skill};
+            }
+        }
+    }
+    for (const [agent, keywords] of Object.entries(AGENT_KEYWORDS)) {
+        for (const keyword of keywords) {
+            if (lower.includes(keyword.toLowerCase())) {
+                return {type: "agent", name: agent};
+            }
+        }
+    }
+    return null;
+}
+
+async function loadAgentPrompt(agentName) {
+    try {
+        const filePath = join(AGENTS_DIR, `${agentName}.md`);
+        return await readFile(filePath, "utf-8");
+    } catch {
+        return null;
+    }
+}
+
+async function main() {
+    const input = await readStdin();
+    let data;
+    try {
+        data = JSON.parse(input);
+    } catch {
+        console.log(JSON.stringify({continue: true}));
+        return;
+    }
+
+    const userPrompt = data.user_prompt || data.userPrompt || data.prompt || "";
+    if (!userPrompt) {
+        console.log(JSON.stringify({continue: true}));
+        return;
+    }
+
+    // Don't interfere with explicit skill invocations
+    if (userPrompt.startsWith("/air-claudecode:")) {
+        console.log(JSON.stringify({continue: true}));
+        return;
+    }
+
+    const match = detectSkill(userPrompt);
+    if (!match) {
+        console.log(JSON.stringify({continue: true}));
+        return;
+    }
+
+    let message;
+
+    if (match.type === "skill") {
+        message = `Detected relevant skill: **${match.name}**
+
+Consider using the \`/air-claudecode:${match.name}\` skill for this task. Invoke it with:
+
+\`\`\`
+/air-claudecode:${match.name} ${userPrompt.slice(0, 100)}
+\`\`\`
+
+Or invoke the Skill tool: \`Skill(skill="air-claudecode:${match.name}", args="${userPrompt.replace(/"/g, '\\"').slice(0, 150)}")\``;
+    } else {
+        const agentPrompt = await loadAgentPrompt(match.name);
+        if (!agentPrompt) {
+            console.log(JSON.stringify({continue: true}));
+            return;
+        }
+        message = `Detected relevant agent: **${match.name}**
+
+Delegate to the ${match.name} agent:
+
+\`\`\`
+Task(subagent_type="air-claudecode:${match.name}", prompt="${userPrompt.replace(/"/g, '\\"').slice(0, 200)}")
+\`\`\`
+
+Agent prompt: ${AGENTS_DIR}/${match.name}.md`;
+    }
+
+    console.log(JSON.stringify({continue: true, message}));
+}
+
+main().catch(() => {
+    console.log(JSON.stringify({continue: true}));
+});

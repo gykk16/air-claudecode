@@ -1,0 +1,24 @@
+{
+  "name": "air-claudecode",
+  "version": "0.1.0",
+  "description": "Lightweight skill-sharing plugin for Claude Code teams",
+  "keywords": [
+    "claude-code",
+    "claude-code-plugin",
+    "skills",
+    "team"
+  ],
+  "files": [
+    ".claude-plugin",
+    "skills",
+    "agents",
+    "hooks",
+    "scripts",
+    "CLAUDE.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
