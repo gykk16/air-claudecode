@@ -30,8 +30,8 @@ Verify air-claudecode plugin installation and check prerequisites. This is the o
    ```
    air-claudecode plugin status:
      Plugin config:  OK (.claude-plugin/plugin.json)
-     Skills:         5 found (git-commit, git-branch, git-pr-master, git-issue-master, jira-master, setup)
-     Agents:         3 found (git-pr-master, git-issue-master, jira-master)
+     Skills:         11 found
+     Agents:         6 found
      Hooks:          OK (SessionStart, UserPromptSubmit)
    ```
 
@@ -42,10 +42,14 @@ Verify air-claudecode plugin installation and check prerequisites. This is the o
    - Run `gh auth status` to check authentication
    - If missing: show installation guide from `docs/gh-installation-guide.md`
 
-   **Atlassian MCP** (required for jira-master, optional for git-pr-master, git-issue-master):
+   **Atlassian MCP** (required for jira-master):
    - Call `ToolSearch("+atlassian jira")` to check if MCP tools are available
    - If available: report OK with connected instance
    - If missing: show installation guide from `docs/mcp-atlassian-installation-guide.md`
+
+   **gogcli** (required for gog-calendar):
+   - Run `which gogcli` to check installation
+   - If missing: show installation guide from `docs/gogcli-installation-guide.md`
 
    Report:
    ```
@@ -66,17 +70,25 @@ Verify air-claudecode plugin installation and check prerequisites. This is the o
    List all skills with invocation examples:
    ```
    Available skills:
-     /air-claudecode:git-commit      -- Conventional commit with Jira/GitHub linking
-     /air-claudecode:git-branch      -- Create branch from Jira ticket or description
-     /air-claudecode:git-pr-master   -- GitHub PR create/review/update/merge
+     /air-claudecode:setup            -- This setup wizard
+     /air-claudecode:git-commit       -- Conventional commit with Jira/GitHub linking
+     /air-claudecode:git-branch       -- Create branch from Jira ticket or description
+     /air-claudecode:git-pr-master    -- GitHub PR create/review/update/merge
      /air-claudecode:git-issue-master -- GitHub issue create/read/update/close
-     /air-claudecode:jira-master     -- Jira ticket CRUD
-     /air-claudecode:setup           -- This setup wizard
+     /air-claudecode:jira-master      -- Jira ticket CRUD
+     /air-claudecode:code-review      -- Comprehensive code review with severity-rated feedback
+     /air-claudecode:software-engineer -- Code implementation (features, bug fixes, refactoring)
+     /air-claudecode:test-engineer    -- Kotlin test generation (JUnit5, AssertJ, Kotest)
+     /air-claudecode:sql-generator    -- SQL DDL/DML generation with strict formatting rules
+     /air-claudecode:gog-calendar     -- Google Calendar management via gogcli
 
    Available agents:
-     air-claudecode:git-pr-master    -- GitHub PR management
-     air-claudecode:git-issue-master -- GitHub issue management
-     air-claudecode:jira-master      -- Jira ticket management
+     air-claudecode:git-pr-master    -- GitHub PR management with Jira integration
+     air-claudecode:git-issue-master -- GitHub issue management with Jira integration
+     air-claudecode:jira-master      -- Jira ticket management via Atlassian MCP
+     air-claudecode:code-reviewer    -- Code review specialist with structured Korean output
+     air-claudecode:software-engineer -- Code implementation specialist
+     air-claudecode:test-engineer    -- Test engineer for Kotlin projects
    ```
 
 4. **Show keyword triggers**
@@ -84,11 +96,16 @@ Verify air-claudecode plugin installation and check prerequisites. This is the o
    Explain that natural language also works:
    ```
    Keyword triggers (auto-detected from your messages):
-     "commit", "커밋"              -> git-commit
-     "create branch", "브랜치 만들" -> git-branch
-     "pr", "pull request"          -> git-pr-master
-     "github issue", "이슈 만들"    -> git-issue-master
-     "jira", "지라", "티켓"         -> jira-master
+     "commit", "커밋"                    -> git-commit
+     "create branch", "브랜치 만들"       -> git-branch
+     "pr", "pull request"                -> git-pr-master
+     "github issue", "이슈 만들"          -> git-issue-master
+     "jira", "지라", "티켓"               -> jira-master
+     "review", "리뷰", "코드 리뷰"        -> code-review
+     "implement", "구현", "개발"          -> software-engineer
+     "test", "테스트 작성"                -> test-engineer
+     "sql", "ddl", "create table"        -> sql-generator
+     "calendar", "일정", "캘린더"         -> gog-calendar
    ```
 
 5. **Ask next action** via `AskUserQuestion`
