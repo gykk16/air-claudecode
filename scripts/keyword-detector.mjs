@@ -36,6 +36,8 @@ const SKILL_KEYWORDS = {
     "code-review": ["code review", "코드 리뷰", "리뷰해", "review this", "pr review", "코드리뷰"],
     "software-engineer": ["implement", "구현", "개발", "feature", "refactor", "코드 작성", "software engineer"],
     "test-engineer": ["test", "테스트", "테스트 작성", "write test", "test code", "테스트 코드", "테스트 만들"],
+    "sql-generator": ["sql", "쿼리", "query", "ddl", "dml", "select", "create table", "테이블 생성"],
+    "gog-calendar": ["일정", "스케줄", "schedule", "calendar", "캘린더", "오늘 일정", "이번주 일정", "내일 일정", "meeting", "미팅 잡아"],
 };
 
 /**

@@ -1,9 +1,9 @@
 # MCP Atlassian Installation Guide
 
-An MCP server that enables using Jira and Confluence from Claude Code.
+MCP Atlassian is an MCP server that enables using Jira and Confluence from Claude Code.
 
-- GitHub repository: https://github.com/sooperset/mcp-atlassian
 - Official docs: https://personal-1d37018d.mintlify.app/docs/installation
+- GitHub repository: https://github.com/sooperset/mcp-atlassian
 
 ---
 
@@ -11,14 +11,14 @@ An MCP server that enables using Jira and Confluence from Claude Code.
 
 ### 1. Generate API Token
 
-Atlassian Cloud users need an API Token.
+Atlassian Cloud users need an API token:
 
 1. Go to https://id.atlassian.com/manage-profile/security/api-tokens
 2. Click **Create API token**
 3. Enter a token name and create
 4. Copy the generated token to a safe location
 
-> Data Center / Server users should use a **Personal Access Token (PAT)** instead of an API Token.
+> **Note:** Data Center / Server users should use a **Personal Access Token (PAT)** instead.
 
 ### 2. Verify Python Installation
 
@@ -26,11 +26,11 @@ Atlassian Cloud users need an API Token.
 python3 --version
 ```
 
-> Python 3.14 is not supported due to compatibility issues. Python 3.12 is recommended.
+> **Note:** Python 3.14 is not supported due to compatibility issues. Python 3.12 is recommended.
 
 ---
 
-## Installation Methods
+## Installation
 
 ### uvx (Recommended)
 
@@ -54,11 +54,19 @@ docker run --env-file .env ghcr.io/sooperset/mcp-atlassian:latest
 
 ---
 
+## Verify Installation
+
+Check that the MCP server is properly connected in Claude Code:
+
+```bash
+claude mcp list
+```
+
+---
+
 ## Claude Code Configuration
 
 ### Config File Location
-
-Configure the MCP server in Claude Code.
 
 ```bash
 # Project-level config
@@ -89,7 +97,7 @@ Configure the MCP server in Claude Code.
 }
 ```
 
-> For Python 3.14 environments, change args to `["--python=3.12", "mcp-atlassian"]`.
+> **Note:** For Python 3.14 environments, change args to `["--python=3.12", "mcp-atlassian"]`.
 
 ### Jira Only
 
@@ -129,7 +137,7 @@ Configure the MCP server in Claude Code.
 
 ### Data Center / Server
 
-Use Personal Access Token instead of Cloud authentication variables.
+Use a Personal Access Token instead of Cloud authentication variables.
 
 ```json
 {
@@ -148,7 +156,7 @@ Use Personal Access Token instead of Cloud authentication variables.
 }
 ```
 
-> For self-signed certificates, add `"JIRA_SSL_VERIFY": "false"`.
+> **Note:** For self-signed certificates, add `"JIRA_SSL_VERIFY": "false"`.
 
 ---
 
@@ -191,16 +199,6 @@ Use Personal Access Token instead of Cloud authentication variables.
 |---|---|
 | `MCP_VERBOSE` | Enable verbose logging |
 | `MCP_VERY_VERBOSE` | Enable more detailed logging |
-
----
-
-## Verify Installation
-
-Check that the MCP server is properly connected in Claude Code:
-
-```bash
-claude mcp list
-```
 
 ---
 
