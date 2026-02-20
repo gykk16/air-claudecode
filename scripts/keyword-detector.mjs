@@ -34,6 +34,7 @@ const SKILL_KEYWORDS = {
     "jira-master": ["jira", "지라", "티켓 만들", "티켓 생성", "티켓 조회", "티켓 수정", "jira ticket", "jira issue"],
     "setup": ["setup", "설정", "설치 확인", "configure air", "air-claudecode setup"],
     "code-review": ["code review", "코드 리뷰", "리뷰해", "review this", "pr review", "코드리뷰"],
+    "software-engineer": ["implement", "구현", "개발", "feature", "refactor", "코드 작성", "software engineer"],
 };
 
 /**
