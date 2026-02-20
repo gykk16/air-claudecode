@@ -64,10 +64,17 @@ This checks all prerequisites (Claude Code, gh CLI, Atlassian MCP) and reports a
 
 ---
 
+## Project Conventions
+
+Team-specific development conventions in [`conventions/project-conventions/`](conventions/project-conventions/).
+
+---
+
 ## Docs
 
 - [GitHub CLI Installation Guide](docs/gh-installation-guide.md)
 - [MCP Atlassian Installation Guide](docs/mcp-atlassian-installation-guide.md)
+- [Git Flow Setup Guide](docs/git-flow-setup.md)
 
 ---
 
