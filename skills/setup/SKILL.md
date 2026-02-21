@@ -31,7 +31,7 @@ Verify air-claudecode plugin installation and check prerequisites. This is the o
    ```
    air-claudecode plugin status:
      Plugin config:  OK (.claude-plugin/plugin.json)
-     Skills:         13 found
+     Skills:         14 found
      Agents:         8 found
      Hooks:          OK (SessionStart, UserPromptSubmit)
    ```
@@ -84,6 +84,7 @@ Verify air-claudecode plugin installation and check prerequisites. This is the o
      /air-claudecode:gog-calendar     -- Google Calendar management via gogcli
      /air-claudecode:technical-writing -- Technical document writer (toss methodology)
      /air-claudecode:sentence-refiner  -- Korean sentence refiner (toss sentence rules)
+     /air-claudecode:deep-dive-plan   -- Deep dive planning (analyze → plan → validate)
 
    Available agents:
      air-claudecode:git-pr-master    -- GitHub PR management with Jira integration
@@ -113,6 +114,7 @@ Verify air-claudecode plugin installation and check prerequisites. This is the o
      "calendar", "일정", "캘린더"         -> gog-calendar
      "기술 문서", "문서 작성", "write document" -> technical-writing
      "문장 다듬", "문장 교정", "sentence refine" -> sentence-refiner
+     "deep dive plan", "심층 분석", "계획 수립"  -> deep-dive-plan
    ```
 
 5. **Ask next action** via `AskUserQuestion`
