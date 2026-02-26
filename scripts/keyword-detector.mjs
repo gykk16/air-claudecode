@@ -41,6 +41,7 @@ const SKILL_KEYWORDS = {
     "gog-calendar": ["일정", "스케줄", "schedule", "calendar", "캘린더", "오늘 일정", "이번주 일정", "내일 일정", "meeting", "미팅 잡아"],
     "technical-writing": ["기술 문서", "문서 작성", "technical writing", "write document", "write a guide", "가이드 작성", "문서화"],
     "sentence-refiner": ["문장 다듬", "문장 교정", "sentence refine", "refine sentence", "문장 수정", "문체 교정"],
+    "todo-management": ["todo", "투두", "할 일", "오늘 할 일", "이번주 할 일", "add task", "add subtask", "서브태스크", "migrate", "backlog", "new week", "topics"],
     "deep-dive-plan": ["deep dive plan", "deep plan", "심층 분석", "계획 수립", "deep dive", "implementation plan", "구현 계획"],
 };
 
