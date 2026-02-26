@@ -1,4 +1,4 @@
-# YYYY-WXX (Mon DD ~ Mon DD)
+# YYYY-WXX (Sun DD ~ Sat DD)
 
 ## Sun MM-DD
 

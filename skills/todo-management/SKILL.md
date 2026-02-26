@@ -1,17 +1,18 @@
 ---
 name: todo-management
-description: Manage weekly markdown TODO files -- create, migrate, review tasks with priority levels, backlog, and topic-based views
+description: Manage weekly markdown TODO files -- create, migrate, review tasks with priority levels, subtasks, backlog, and topic-based views
 model: haiku
-argument-hint: "[today] [this week] [migrate] [backlog] [new week] [add task] [topics] [topic <name>]"
+argument-hint: "[today] [this week] [migrate] [backlog] [new week] [add task] [add subtask] [topics] [topic <name>]"
 ---
 
 # TODO Management
 
-Manage weekly markdown TODO files with daily sections, priority levels, task migration, and backlog tracking.
+Manage weekly markdown TODO files with daily sections, priority levels, subtasks, task migration, backlog, and topic-based views.
 
 ## Use When
 - User says "todo", "task", "할 일", "투두", "이번주 할 일", "오늘 할 일"
 - User wants to add, check, migrate, or review tasks
+- User wants to add or manage subtasks ("add subtask", "서브태스크")
 - User asks about backlog or weekly planning
 - User wants to view or manage tasks by topic/project
 - Sunday weekly review or new week setup
@@ -55,14 +56,16 @@ Then initialize the directory structure if it doesn't exist:
 
 ## File Structure
 
-- **Weekly file**: `YYYY-WXX.md` (ISO week number, week starts Sunday)
-- **Backlog**: `backlog.md` for unscheduled/deferred tasks
-- **Topics**: `topics.md` for topic/project registry
-- **Template**: `templates/weekly.md` for new week creation
+| File | Purpose |
+|---|---|
+| `YYYY-WXX.md` | Weekly file (ISO week, Sunday start) |
+| `backlog.md` | Unscheduled/deferred tasks (P1, P2, Ideas) |
+| `topics.md` | Topic/project registry (Active, Archived) |
+| `templates/weekly.md` | Template for new week creation |
 
 ### Week Number Calculation
 
-Use ISO week numbering but with **Sunday as week start**:
+Use ISO week numbering with **Sunday as week start**:
 ```bash
 date +%G-W%V  # reference, but adjust for Sunday start
 ```
@@ -77,7 +80,6 @@ Each task is a single line with optional metadata fields:
 - [ ] Task description @assignee #tag %topic ~estimate due-date [REF-ID]
 ```
 
-Metadata fields (all optional, same line):
 | Field | Format | Example |
 |---|---|---|
 | Assignee | `@name` | `@young` |
@@ -86,12 +88,54 @@ Metadata fields (all optional, same line):
 | Estimate | `~Nh` or `~Nd` | `~2h`, `~1d` |
 | Due date | `YYYY-MM-DD` | `2026-03-05` |
 | External ref | `[ID]` | `[JIRA-101]` |
+| Link | `[text](url)` | `[slack](https://...)` |
 | Migration source | `<- Day` | `<- Mon` |
-| Subtasks | indented 2 spaces | `  - [ ] Subtask` |
+
+All metadata fields are optional and placed on the same line.
 
 - `#tag` = task type (bug, feat, docs), `%topic` = project/area the task belongs to
 - One task can have one `%topic` (keeps grouping simple)
 - Topic names use kebab-case
+
+---
+
+## Subtasks
+
+Subtasks are indented **2 spaces** under a parent task:
+
+```markdown
+- [ ] git repo 세팅 %항공-내재화 #feat ~2d
+  - [ ] 기본 아키텍처 설계 ~2h
+  - [ ] 패키지 구조 세팅 ~2h
+  - [x] 라이브러리 선정 및 추가 ~1h
+  - [ ] 배포 스크립트 세팅 ~3h
+```
+
+### Rules
+
+| Rule | Detail |
+|---|---|
+| Max depth | **2 levels only** (parent → child). No nested subtasks |
+| Metadata | Subtasks support all fields except `%topic` (inherited from parent) |
+| Progress | Auto-display `(done/total)` counter next to parent when subtasks exist |
+| Completion | Parent `[x]` only when **all** children are `[x]` or `[-]` |
+| Blocked | If any child is `[!]`, parent is considered blocked |
+| Migration | Parent migrates with **all** children together as a unit |
+| Estimates | Parent `~estimate` = total budget. Child estimates = breakdown |
+| Adding | New subtask appended at end of children list |
+| Dropping | Dropping parent (`[-]`) drops all children. Dropping a child does not affect parent |
+
+### Progress Display
+
+The `(done/total)` counter is shown in **display output only** -- it is NOT written into the markdown file. Progress is calculated on read.
+
+```markdown
+- [ ] git repo 세팅 (1/4) %항공-내재화 #feat ~2d
+  - [x] 기본 아키텍처 설계 ~2h
+  - [ ] 패키지 구조 세팅 ~2h
+  - [ ] 라이브러리 선정 및 추가 ~1h
+  - [ ] 배포 스크립트 세팅 ~3h
+```
 
 ---
 
@@ -121,25 +165,22 @@ Each daily section has three priority subsections:
 
 ## Weekly File Format
 
+See `templates/weekly.md` for the full template. Structure:
+
 ```markdown
-# YYYY-WXX (Mon DD ~ Mon DD)
+# YYYY-WXX (Sun DD ~ Sat DD)
 
 ## Sun MM-DD
 
 ### P0
-- [ ] Critical task
 
 ### P1
-- [ ] Important task
 
 ### P2
-- [ ] Nice to have
 
 ---
 
 ## Mon MM-DD
-
-### P0
 ...
 ```
 
@@ -155,26 +196,43 @@ Each daily section has three priority subsections:
 1. Determine current date and find the matching weekly file
 2. Read the day's section
 3. Display tasks grouped by priority with status counts
+4. For tasks with subtasks, show `(done/total)` progress counter
 
 ### Add Task
 1. Parse task description and metadata from user input
 2. Determine target day (default: today) and priority (default: P1)
 3. Append to the correct section in the weekly file
+4. **If user specifies subtasks** (e.g., "add task X with subtasks A, B, C"):
+   - Create parent task line
+   - Add each subtask indented 2 spaces below parent
+5. Confirm addition
+
+### Add Subtask
+1. Find the parent task by description or line number
+2. Validate parent is not itself a subtask (max 2 levels)
+3. Append new subtask indented 2 spaces at end of existing children
 4. Confirm addition
 
 ### Complete Task
 1. Find the task by description or line number
-2. Change `[ ]` to `[x]`
-3. Confirm completion
+2. **If task has subtasks**: check all children are `[x]` or `[-]` before allowing parent completion
+   - If incomplete children exist: warn user and list them
+   - User can force-complete (marks all open children `[-]`) or complete children first
+3. **If task is a subtask**: change `[ ]` to `[x]`, then check if all siblings are done to prompt parent completion
+4. Change `[ ]` to `[x]`
+5. Confirm completion
 
 ### Migrate Tasks (End of Day)
-1. Find all `[ ]` (open) tasks in today's section
+1. Find all `[ ]` (open) parent-level tasks in today's section
 2. For each open task:
    - Change to `[>]` in today's section
    - Copy to next day as `[ ]` with `<- Day` marker
+   - **If task has subtasks**: migrate parent and all children together
+     - Children keep their current status (`[x]` stays `[x]`, `[ ]` stays `[ ]`)
+     - Only the parent gets `[>]` / `<- Day` markers, not individual children
 3. **3+ day migration rule**: if a task has been migrated 3+ times, prompt user:
-   - Move to backlog
-   - Drop with `[-]`
+   - Move to backlog (with all subtasks)
+   - Drop with `[-]` (drops parent and all children)
    - Keep migrating (must justify)
 
 ### Cross-Week Migration
@@ -190,18 +248,28 @@ Each daily section has three priority subsections:
 ### Weekly Review (Saturday)
 1. Read all `[>]` tasks from the week
 2. For each, ask user to decide:
-   - Move to next week's Sunday
-   - Move to backlog
-   - Drop with `[-]`
+   - Move to next week's Sunday (with subtasks)
+   - Move to backlog (with subtasks)
+   - Drop with `[-]` (drops parent and all children)
 3. Show weekly summary:
-   - Total tasks: created, completed, dropped, migrated
+   - Total tasks: created, completed, dropped, migrated (parent-level only)
    - Completion rate
+   - Per-topic breakdown (see Topic Summary below)
 
-### Backlog Management
+---
+
+## Backlog Operations
+
 - Show backlog grouped by P1, P2, Ideas
-- Add task to backlog with priority
+- Add task to backlog with priority (supports subtasks)
 - Move backlog task to a specific day
 - Review backlog (suggested every Sunday)
+
+---
+
+## Topic Operations
+
+Topics are **cross-cutting views**, not containers. Tasks live in weekly/backlog files; `%topic` is a filter.
 
 ### List Topics
 1. Read `topics.md`
@@ -211,7 +279,6 @@ Each daily section has three priority subsections:
 ## Active Topics
 - air-backend (3 open | 5 done)
 - search-engine (1 open | 2 done)
-- infra (0 open | 1 done)
 
 ## Archived
 - auth-migration (completed 2026-02)
@@ -221,15 +288,18 @@ Each daily section has three priority subsections:
 1. Accept topic name (e.g., "show topic air-backend")
 2. Scan current week file + backlog for tasks with matching `%topic`
 3. Group by source: "This Week" (with day/priority info) and "Backlog"
-4. Show estimate rollup and blocked count
-5. Display format:
+4. Show subtasks under their parent tasks
+5. Show estimate rollup and blocked count
+6. Display format:
 ```
 ## Topic: air-backend (3 open | 2 done)
 
 ### This Week (W09)
-- [ ] Implement auth API @young #feat ~4h 2026-02-28 [JIRA-101]  (Thu P0)
-- [x] Fix DB connection pool #bug ~1h                              (Wed P1)
-- [ ] Write onboarding guide #docs ~1d                             (Fri P1)
+- [ ] Implement auth API (1/3) @young #feat ~4h 2026-02-28 [JIRA-101]  (Thu P0)
+  - [x] Define API spec ~1h
+  - [ ] Implement endpoints ~2h
+  - [ ] Write tests ~1h
+- [x] Fix DB connection pool #bug ~1h                                    (Wed P1)
 
 ### Backlog
 - [ ] Add rate limiting #feat ~3h
@@ -253,7 +323,7 @@ Estimate remaining: ~9h | Blocked: 0
 5. Confirm archival
 
 ### Topic Summary (part of Weekly Review)
-1. During Saturday weekly review, also show per-topic breakdown:
+During Saturday weekly review, show per-topic breakdown:
 ```
 ### Topic Summary
 | Topic | Created | Done | Dropped | Migrated | Rate |
@@ -264,46 +334,9 @@ Estimate remaining: ~9h | Blocked: 0
 
 ---
 
-## Topics File Format
-
-```markdown
-# Topics
-
-> Active projects and areas of work. Tasks use %topic-name to link here.
-
-## Active
-- **topic-name**: Description of the topic/project
-
-## Archived
-- **topic-name**: (completed YYYY-MM) Description
-```
-
-- Topics use kebab-case names matching the `%topic` field in tasks
-- `Active` topics appear in default views and summaries
-- `Archived` topics are hidden from default views but tasks remain searchable
-
----
-
-## Backlog File Format
-
-```markdown
-# Backlog
-
-## P1
-- [ ] Important unscheduled task @young #feat ~4h [JIRA-201]
-
-## P2
-- [ ] Lower priority task #refactor
-
-## Ideas
-- [ ] Someday/maybe idea
-```
-
----
-
 ## Display Format
 
-When showing tasks, use this format:
+When showing tasks, use this format. Counts are **parent-level tasks only** (subtasks excluded from summary counts):
 
 ```
 ## Today: Wed 02-26 (2026-W09)
@@ -311,15 +344,20 @@ When showing tasks, use this format:
 ### P0 (1/1 done)
 - [x] Deploy hotfix #ops ~1h [JIRA-301]
 
-### P1 (0/2 done)
+### P1 (0/3 done)
 - [ ] Review PR for auth module @young #review ~2h
 - [!] Update API docs #docs -- blocked: waiting on spec
+- [ ] git repo 세팅 (1/4) %항공-내재화 #feat ~2d
+  - [x] 기본 아키텍처 설계 ~2h
+  - [ ] 패키지 구조 세팅 ~2h
+  - [ ] 라이브러리 선정 및 추가 ~1h
+  - [ ] 배포 스크립트 세팅 ~3h
 
 ### P2 (0/1 done)
 - [ ] Clean up test fixtures #refactor ~1h
 
 ---
-Summary: 1/4 done | 1 blocked | 0 migrated
+Summary: 1/5 done | 1 blocked | 0 migrated
 ```
 
 ---
@@ -335,6 +373,9 @@ Summary: 1/4 done | 1 blocked | 0 migrated
 | Topic not in registry | Offer to add it to `topics.md` |
 | No tasks for topic | "No tasks found for %topic-name." |
 | Topics file not found | Create from template |
+| Complete parent with open subtasks | Warn and list incomplete children |
+| Add subtask to a subtask | Reject: "Max 2 levels. Subtasks cannot have children." |
+| Subtask without parent | Treat as regular task (remove indent) |
 
 ---
 
@@ -345,5 +386,8 @@ Summary: 1/4 done | 1 blocked | 0 migrated
 - **3-day migration rule** forces priority re-evaluation
 - **Keep P0 short** (1~3 items) to maintain focus
 - **Sunday start**: weeks run Sun through Sat
-- **Topics are views, not containers** -- tasks live in weekly/backlog files, `%topic` is a cross-cutting filter
+- **Topics are views, not containers** -- `%topic` is a cross-cutting filter
 - **Topics are optional** -- tasks without `%topic` work exactly as before
+- **Subtasks max 2 levels** -- parent → child only, no deeper nesting
+- **Subtasks are atomic with parent** -- migrate, drop, and move as a unit
+- **Counts use parent-level tasks** -- subtasks are progress within a task, not separate tasks
