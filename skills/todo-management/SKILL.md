@@ -28,13 +28,14 @@ Manage weekly markdown TODO files with daily sections, priority levels, task mig
 On first invocation, check if the todo workspace location is configured:
 
 1. **Read user's CLAUDE.md** (`~/.claude/CLAUDE.md`) and look for a `todo-workspace` entry
-2. **If not found**: ask user via `AskUserQuestion` where to store TODO files
-   - Suggest default: `~/todo-workspace/`
-   - Save the chosen path to `~/.claude/CLAUDE.md` as:
-     ```
-     ## Todo Workspace
-     todo-workspace: /absolute/path/to/todo
-     ```
+2. **If not found**:
+   a. Ask user via `AskUserQuestion` where to store TODO files (suggest default: `~/todo-workspace/`)
+   b. **MUST save immediately**: Use the `Edit` tool to append the following block to `~/.claude/CLAUDE.md`:
+      ```
+      ## Todo Workspace
+      todo-workspace: /absolute/path/to/todo
+      ```
+   c. **Do NOT proceed** to directory initialization until the Edit tool confirms the write succeeded
 3. **If found**: use the configured path
 
 Then initialize the directory structure if it doesn't exist:
