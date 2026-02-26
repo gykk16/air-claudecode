@@ -7,8 +7,6 @@ argument-hint: "[today] [this week] [migrate] [backlog] [new week] [add task] [a
 
 # TODO Management
 
-Manage weekly markdown TODO files with daily sections, priority levels, subtasks, task migration, backlog, and topic-based views.
-
 ## Use When
 - User says "todo", "task", "할 일", "투두", "이번주 할 일", "오늘 할 일"
 - User wants to add, check, migrate, or review tasks
@@ -101,23 +99,21 @@ All metadata fields are optional and placed on the same line.
 
 ## Subtasks
 
-Subtasks are indented **2 spaces** under a parent task:
+Subtasks are indented **2 spaces** under a parent task. The `(done/total)` counter is **display only** -- not written into the file.
 
 ```markdown
 - [ ] git repo 세팅 %항공-내재화 #feat ~2d
-  - [ ] 기본 아키텍처 설계 ~2h
+  - [x] 기본 아키텍처 설계 ~2h
   - [ ] 패키지 구조 세팅 ~2h
-  - [x] 라이브러리 선정 및 추가 ~1h
+  - [ ] 라이브러리 선정 및 추가 ~1h
   - [ ] 배포 스크립트 세팅 ~3h
 ```
-
-### Rules
 
 | Rule | Detail |
 |---|---|
 | Max depth | **2 levels only** (parent → child). No nested subtasks |
 | Metadata | Subtasks support all fields except `%topic` (inherited from parent) |
-| Progress | Auto-display `(done/total)` counter next to parent when subtasks exist |
+| Progress | Auto-display `(done/total)` counter next to parent |
 | Completion | Parent `[x]` only when **all** children are `[x]` or `[-]` |
 | Blocked | If any child is `[!]`, parent is considered blocked |
 | Migration | Parent migrates with **all** children together as a unit |
@@ -125,29 +121,17 @@ Subtasks are indented **2 spaces** under a parent task:
 | Adding | New subtask appended at end of children list |
 | Dropping | Dropping parent (`[-]`) drops all children. Dropping a child does not affect parent |
 
-### Progress Display
-
-The `(done/total)` counter is shown in **display output only** -- it is NOT written into the markdown file. Progress is calculated on read.
-
-```markdown
-- [ ] git repo 세팅 (1/4) %항공-내재화 #feat ~2d
-  - [x] 기본 아키텍처 설계 ~2h
-  - [ ] 패키지 구조 세팅 ~2h
-  - [ ] 라이브러리 선정 및 추가 ~1h
-  - [ ] 배포 스크립트 세팅 ~3h
-```
-
 ---
 
 ## Status Symbols
 
-| Symbol | Meaning |
-|---|---|
-| `- [ ]` | Open -- not started |
-| `- [x]` | Done -- completed |
-| `- [-]` | Dropped -- won't do / cancelled |
-| `- [>]` | Migrated -- moved to next day |
-| `- [!]` | Blocked -- waiting on something |
+| File syntax | Display icon | Meaning |
+|---|---|---|
+| `- [ ]` | ⬜ | Open -- not started |
+| `- [x]` | ✅ | Done -- completed |
+| `- [-]` | ⛔ | Dropped -- cancelled |
+| `- [>]` | ➡️ | Migrated -- moved to next day |
+| `- [!]` | 🟡 | Blocked -- waiting on something |
 
 ---
 
@@ -165,28 +149,7 @@ Each daily section has three priority subsections:
 
 ## Weekly File Format
 
-See `templates/weekly.md` for the full template. Structure:
-
-```markdown
-# YYYY-WXX (Sun DD ~ Sat DD)
-
-## Sun MM-DD
-
-### P0
-
-### P1
-
-### P2
-
----
-
-## Mon MM-DD
-...
-```
-
-- Days run **Sun through Sat**
-- Days separated by horizontal rule (`---`)
-- Each day has `### P0`, `### P1`, `### P2` subsections
+See `templates/weekly.md` for the full template. Days run **Sun through Sat**, separated by `---`. Each day has `### P0`, `### P1`, `### P2` subsections.
 
 ---
 
@@ -344,19 +307,7 @@ During Saturday weekly review, show per-topic breakdown:
 
 ## Display Format
 
-When showing tasks, use this **clean list** format. Each task is numbered, with status icon prefix. Metadata is on a separate `└` line below the task name. Subtasks use `└ [ ]` format. Counts are **parent-level tasks only**.
-
-**Status icons:**
-| Icon | Meaning |
-|---|---|
-| ✅ | Done |
-| ⬜ | Open (no subtasks) |
-| ⬜ N/M | Open with subtask progress |
-| 🟡 | Blocked |
-| ➡️ | Migrated |
-| ⛔ | Dropped |
-
-**Example:**
+When showing tasks, use this **clean list** format. Status icons from the Status Symbols table. Counts are **parent-level tasks only**.
 
 ```
 ## Today: Wed 02-26 (W09)
@@ -392,14 +343,9 @@ When showing tasks, use this **clean list** format. Each task is numbered, with 
 ```
 
 **Rules:**
-- Task name is the first line, **without** metadata -- keep it clean and scannable
-- Metadata (`@assignee`, `#tag`, `%topic`, `~estimate`, `[REF]`) goes on the next `└` line, pipe-separated
+- Task name first line (no metadata) → metadata on `└` line (pipe-separated) → subtasks on `└ [ ]` lines
 - Blocked reason gets its own `└ blocked:` line
-- External refs (`[JIRA-101]`, `[slack](url)`) go in the metadata line
-- Subtasks use `└ [ ]` / `└ [x]` format
-- Done tasks show ✅ with task name only (metadata can be omitted)
-- Empty priority sections show just the header (e.g., `### P0 -- empty`)
-- Numbers are sequential across all priorities (not per-section)
+- Numbers are sequential across all priorities
 
 ---
 
