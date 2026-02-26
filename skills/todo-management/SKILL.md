@@ -82,7 +82,7 @@ Each task is a single line with optional metadata fields:
 
 | Field | Format | Example |
 |---|---|---|
-| Assignee | `@name` | `@young` |
+| Assignee | `@name` | `@alice` |
 | Tag | `#tag` | `#bug`, `#feat`, `#refactor`, `#docs` |
 | Topic | `%topic` | `%air-backend`, `%search-engine` |
 | Estimate | `~Nh` or `~Nd` | `~2h`, `~1d` |
@@ -295,15 +295,23 @@ Topics are **cross-cutting views**, not containers. Tasks live in weekly/backlog
 ## Topic: air-backend (3 open | 2 done)
 
 ### This Week (W09)
-- [ ] Implement auth API (1/3) @young #feat ~4h 2026-02-28 [JIRA-101]  (Thu P0)
-  - [x] Define API spec ~1h
-  - [ ] Implement endpoints ~2h
-  - [ ] Write tests ~1h
-- [x] Fix DB connection pool #bug ~1h                                    (Wed P1)
+
+⬜ 1. Implement auth API (1/3)                              (Thu P0)
+   └ @alice | #feat | ~4h | 2026-02-28 | [JIRA-101]
+   └ [x] Define API spec ~1h
+   └ [ ] Implement endpoints ~2h
+   └ [ ] Write tests ~1h
+
+✅ 2. Fix DB connection pool                                (Wed P1)
+   └ #bug | ~1h
 
 ### Backlog
-- [ ] Add rate limiting #feat ~3h
-- [ ] Refactor error handling #refactor ~4h
+
+⬜ 3. Add rate limiting
+   └ #feat | ~3h
+
+⬜ 4. Refactor error handling
+   └ #refactor | ~4h
 
 ---
 Estimate remaining: ~9h | Blocked: 0
@@ -336,29 +344,62 @@ During Saturday weekly review, show per-topic breakdown:
 
 ## Display Format
 
-When showing tasks, use this format. Counts are **parent-level tasks only** (subtasks excluded from summary counts):
+When showing tasks, use this **clean list** format. Each task is numbered, with status icon prefix. Metadata is on a separate `└` line below the task name. Subtasks use `└ [ ]` format. Counts are **parent-level tasks only**.
+
+**Status icons:**
+| Icon | Meaning |
+|---|---|
+| ✅ | Done |
+| ⬜ | Open (no subtasks) |
+| ⬜ N/M | Open with subtask progress |
+| 🟡 | Blocked |
+| ➡️ | Migrated |
+| ⛔ | Dropped |
+
+**Example:**
 
 ```
-## Today: Wed 02-26 (2026-W09)
+## Today: Wed 02-26 (W09)
 
-### P0 (1/1 done)
-- [x] Deploy hotfix #ops ~1h [JIRA-301]
+### P0 (1/1)
 
-### P1 (0/3 done)
-- [ ] Review PR for auth module @young #review ~2h
-- [!] Update API docs #docs -- blocked: waiting on spec
-- [ ] git repo 세팅 (1/4) %항공-내재화 #feat ~2d
-  - [x] 기본 아키텍처 설계 ~2h
-  - [ ] 패키지 구조 세팅 ~2h
-  - [ ] 라이브러리 선정 및 추가 ~1h
-  - [ ] 배포 스크립트 세팅 ~3h
+✅ 1. Deploy hotfix
+   └ #ops | ~1h | [JIRA-301]
 
-### P2 (0/1 done)
-- [ ] Clean up test fixtures #refactor ~1h
+### P1 (0/3)
+
+⬜ 2. Review PR for auth module
+   └ @alice | #review | ~2h
+
+🟡 3. Update API docs
+   └ #docs
+   └ blocked: waiting on spec
+
+⬜ 4. git repo 세팅 (1/4)
+   └ @bob | %항공-내재화 | #feat | ~2d
+   └ [x] 기본 아키텍처 설계 ~2h
+   └ [ ] 패키지 구조 세팅 ~2h
+   └ [ ] 라이브러리 선정 및 추가 ~1h
+   └ [ ] 배포 스크립트 세팅 ~3h
+
+### P2 (0/1)
+
+⬜ 5. Clean up test fixtures
+   └ #refactor | ~1h
 
 ---
-Summary: 1/5 done | 1 blocked | 0 migrated
+1/5 done | 1 blocked | 0 migrated
 ```
+
+**Rules:**
+- Task name is the first line, **without** metadata -- keep it clean and scannable
+- Metadata (`@assignee`, `#tag`, `%topic`, `~estimate`, `[REF]`) goes on the next `└` line, pipe-separated
+- Blocked reason gets its own `└ blocked:` line
+- External refs (`[JIRA-101]`, `[slack](url)`) go in the metadata line
+- Subtasks use `└ [ ]` / `└ [x]` format
+- Done tasks show ✅ with task name only (metadata can be omitted)
+- Empty priority sections show just the header (e.g., `### P0 -- empty`)
+- Numbers are sequential across all priorities (not per-section)
 
 ---
 
