@@ -1,8 +1,8 @@
 ---
 name: todo-management
-description: Manage weekly markdown TODO files -- create, migrate, review tasks with priority levels and backlog
+description: Manage weekly markdown TODO files -- create, migrate, review tasks with priority levels, backlog, and topic-based views
 model: haiku
-argument-hint: "[today] [this week] [migrate] [backlog] [new week] [add task]"
+argument-hint: "[today] [this week] [migrate] [backlog] [new week] [add task] [topics] [topic <name>]"
 ---
 
 # TODO Management
@@ -13,6 +13,7 @@ Manage weekly markdown TODO files with daily sections, priority levels, task mig
 - User says "todo", "task", "할 일", "투두", "이번주 할 일", "오늘 할 일"
 - User wants to add, check, migrate, or review tasks
 - User asks about backlog or weekly planning
+- User wants to view or manage tasks by topic/project
 - Sunday weekly review or new week setup
 
 ## Do Not Use When
@@ -41,11 +42,13 @@ Then initialize the directory structure if it doesn't exist:
 <workspace>/
   ├── templates/
   │   └── weekly.md
-  └── backlog.md
+  ├── backlog.md
+  └── topics.md
 ```
 
 - Copy `<skill_base_dir>/templates/weekly.md` as the weekly template
 - Copy `<skill_base_dir>/templates/backlog.md` as `backlog.md`
+- Copy `<skill_base_dir>/templates/topics.md` as `topics.md`
 
 ---
 
@@ -53,6 +56,7 @@ Then initialize the directory structure if it doesn't exist:
 
 - **Weekly file**: `YYYY-WXX.md` (ISO week number, week starts Sunday)
 - **Backlog**: `backlog.md` for unscheduled/deferred tasks
+- **Topics**: `topics.md` for topic/project registry
 - **Template**: `templates/weekly.md` for new week creation
 
 ### Week Number Calculation
@@ -69,7 +73,7 @@ date +%G-W%V  # reference, but adjust for Sunday start
 Each task is a single line with optional metadata fields:
 
 ```
-- [ ] Task description @assignee #tag ~estimate due-date [REF-ID]
+- [ ] Task description @assignee #tag %topic ~estimate due-date [REF-ID]
 ```
 
 Metadata fields (all optional, same line):
@@ -77,11 +81,16 @@ Metadata fields (all optional, same line):
 |---|---|---|
 | Assignee | `@name` | `@young` |
 | Tag | `#tag` | `#bug`, `#feat`, `#refactor`, `#docs` |
+| Topic | `%topic` | `%air-backend`, `%search-engine` |
 | Estimate | `~Nh` or `~Nd` | `~2h`, `~1d` |
 | Due date | `YYYY-MM-DD` | `2026-03-05` |
 | External ref | `[ID]` | `[JIRA-101]` |
 | Migration source | `<- Day` | `<- Mon` |
 | Subtasks | indented 2 spaces | `  - [ ] Subtask` |
+
+- `#tag` = task type (bug, feat, docs), `%topic` = project/area the task belongs to
+- One task can have one `%topic` (keeps grouping simple)
+- Topic names use kebab-case
 
 ---
 
@@ -193,6 +202,85 @@ Each daily section has three priority subsections:
 - Move backlog task to a specific day
 - Review backlog (suggested every Sunday)
 
+### List Topics
+1. Read `topics.md`
+2. Show active topics with task counts (scan current week file + backlog for `%topic` matches)
+3. Display format:
+```
+## Active Topics
+- air-backend (3 open | 5 done)
+- search-engine (1 open | 2 done)
+- infra (0 open | 1 done)
+
+## Archived
+- auth-migration (completed 2026-02)
+```
+
+### Show Topic
+1. Accept topic name (e.g., "show topic air-backend")
+2. Scan current week file + backlog for tasks with matching `%topic`
+3. Group by source: "This Week" (with day/priority info) and "Backlog"
+4. Show estimate rollup and blocked count
+5. Display format:
+```
+## Topic: air-backend (3 open | 2 done)
+
+### This Week (W09)
+- [ ] Implement auth API @young #feat ~4h 2026-02-28 [JIRA-101]  (Thu P0)
+- [x] Fix DB connection pool #bug ~1h                              (Wed P1)
+- [ ] Write onboarding guide #docs ~1d                             (Fri P1)
+
+### Backlog
+- [ ] Add rate limiting #feat ~3h
+- [ ] Refactor error handling #refactor ~4h
+
+---
+Estimate remaining: ~9h | Blocked: 0
+```
+
+### Add Topic
+1. Accept topic name and optional description
+2. Validate kebab-case naming
+3. Append to `## Active` section in `topics.md`
+4. Confirm addition
+
+### Archive Topic
+1. Accept topic name
+2. Scan current week file + backlog for open tasks with `%topic`
+3. If open tasks exist: warn user and list them, ask to confirm
+4. Move topic from `## Active` to `## Archived` with completion date
+5. Confirm archival
+
+### Topic Summary (part of Weekly Review)
+1. During Saturday weekly review, also show per-topic breakdown:
+```
+### Topic Summary
+| Topic | Created | Done | Dropped | Migrated | Rate |
+|---|---|---|---|---|---|
+| air-backend | 5 | 3 | 0 | 2 | 60% |
+| search-engine | 2 | 2 | 0 | 0 | 100% |
+```
+
+---
+
+## Topics File Format
+
+```markdown
+# Topics
+
+> Active projects and areas of work. Tasks use %topic-name to link here.
+
+## Active
+- **topic-name**: Description of the topic/project
+
+## Archived
+- **topic-name**: (completed YYYY-MM) Description
+```
+
+- Topics use kebab-case names matching the `%topic` field in tasks
+- `Active` topics appear in default views and summaries
+- `Archived` topics are hidden from default views but tasks remain searchable
+
 ---
 
 ## Backlog File Format
@@ -243,6 +331,9 @@ Summary: 1/4 done | 1 blocked | 0 migrated
 | Workspace not configured | Run first-time setup |
 | No tasks for today | Show "No tasks for today. Add one?" |
 | Backlog empty | "Backlog is empty." |
+| Topic not in registry | Offer to add it to `topics.md` |
+| No tasks for topic | "No tasks found for %topic-name." |
+| Topics file not found | Create from template |
 
 ---
 
@@ -253,3 +344,5 @@ Summary: 1/4 done | 1 blocked | 0 migrated
 - **3-day migration rule** forces priority re-evaluation
 - **Keep P0 short** (1~3 items) to maintain focus
 - **Sunday start**: weeks run Sun through Sat
+- **Topics are views, not containers** -- tasks live in weekly/backlog files, `%topic` is a cross-cutting filter
+- **Topics are optional** -- tasks without `%topic` work exactly as before
