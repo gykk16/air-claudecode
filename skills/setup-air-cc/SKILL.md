@@ -259,6 +259,7 @@ cat .claude-plugin/plugin.json | jq -r '.version'
 <\!--air-claudecode:start-->
 <\!-- air-claudecode v{version} — auto-generated, do not edit manually -->
 <\!-- To update: /air-claudecode:setup-air-cc --update -->
+software-engineer-trigger: ALWAYS use the `/air-claudecode:software-engineer` skill when writing code, implementing features, or fixing bugs. Never write code directly.
 <\!--air-claudecode:end-->
 ```
 
