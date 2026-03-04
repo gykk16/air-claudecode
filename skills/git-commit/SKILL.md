@@ -114,3 +114,14 @@ AI-authored: 90%
 ```
 
 </example>
+
+## Final Checklist
+- [ ] Changes analyzed -- not just filenames, actual diff read
+- [ ] Commit type matches the nature of changes
+- [ ] Subject is imperative mood, lowercase, under 50 chars, no period
+- [ ] Jira ticket linked in footer if detected from branch
+- [ ] GitHub issue linked in footer if detected
+- [ ] Changed files and full message shown to user before commit (Default Mode)
+- [ ] User explicitly confirmed via AskUserQuestion (Default Mode) or Auto Mode detected
+- [ ] AI-authored percentage **always** included in footer (integer, no decimals) — never omit this line
+- [ ] Multiple concerns flagged for splitting if detected
