@@ -147,7 +147,7 @@ import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty
   - `FareFamilyType_80157S` → `FareFamilyType`
   - `MonetaryInformationType198917S` → `MonetaryInformationType` (no underscore case)
   - `AddressDetailsTypeU_198210C` → `AddressDetailsTypeU` (preserve `U`)
-- **Strip trailing `I` suffix from class names**: after removing the version suffix, also remove a trailing `I` that XSD uses as an internal type variant marker. This `I` is not meaningful in the Kotlin domain model. Examples:
+- **Strip trailing `I` suffix from class names (conditional)**: remove trailing `I` **only when the original XSD type name ends with `I_?\d{3,}[A-Z]?$`** (i.e., `I` directly precedes the internal version suffix). Do not remove `I` for names where it is part of the domain term. Examples:
   - `StatusDetailsTypeI_185722C` → strip version → `StatusDetailsTypeI` → strip `I` → `StatusDetailsType`
   - `ItemNumberTypeI_192331C` → `ItemNumberType`
   - `SelectionDetailsTypeI_185689C` → `SelectionDetailsType`
@@ -164,6 +164,7 @@ import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty
   |---|---|---|---|
   | `1` or omitted | `T` (single) | **Singular** — even if the XML element name is plural | `errorDetails` → `errorDetail`, `taxInformations` → `taxInformation` |
   | `> 1` or `unbounded` | `List<T>` | **Plural** — even if the XML element name is singular | `itinerary` → `itineraries`, `passenger` → `passengers` |
+
 - **Suffix**: if a suffix is used (e.g., `24`), apply it to ALL classes in the file consistently
 
 #### Structural Rules
