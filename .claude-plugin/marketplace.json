@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "air-claudecode",
+  "version": "0.1.0",
+  "description": "Lightweight skill-sharing plugin for Claude Code teams. Zero dependencies, zero config.",
+  "owner": {
+    "name": "youngkwang",
+    "email": "gykk16@gmail.com"
+  },
+  "plugins": []
+}
