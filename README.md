@@ -66,6 +66,11 @@ Marketplaces tab, select `air-claudecode`, and enable auto-update.
 /plugin marketplace remove air-claudecode
 ```
 
+## Contributing
+
+To add a new plugin, follow [docs/plugin-guide.md](docs/plugin-guide.md) and
+the standards in [docs/design-criteria.md](docs/design-criteria.md).
+
 ## References
 
 - [Plugins overview](https://code.claude.com/docs/en/plugins.md)
