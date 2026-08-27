@@ -8,6 +8,10 @@ then constraint policies (FK, index, check), then the complete template.
 Always `bigint` type `id` as the primary key, named `pk_{table}`.
 Consistent across tables, framework-friendly, and simple to join on.
 
+On MySQL/MariaDB the default is `bigint unsigned`, and columns referencing an
+id use the same type (`user_id bigint unsigned`). PostgreSQL and Oracle have
+no unsigned types — use plain `bigint` there.
+
 ## Audit columns
 
 Every table includes these four columns:
@@ -45,12 +49,23 @@ metadata or DB-level management, use a reference table:
 
 ```sql
 create table user_statuses (
-    id           bigint comment '상태 ID'
+    id           bigint unsigned comment '상태 ID'
   , code         varchar(20) not null comment '상태 코드'
   , name         varchar(50) not null comment '상태명'
   , constraint pk_user_statuses primary key (id)
-) comment '사용자 상태';
+) comment '사용자 상태' default charset=utf8mb4 collate=utf8mb4_general_ci;
 -- create unique index udx_user_statuses_01 on user_statuses (code);
+```
+
+## MySQL / MariaDB defaults
+
+Declare these explicitly on every table:
+
+- Charset / collation: `utf8mb4` / `utf8mb4_general_ci`
+- `id` and id-referencing columns: `bigint unsigned`
+
+```sql
+) comment '주문' default charset=utf8mb4 collate=utf8mb4_general_ci;
 ```
 
 ## Comment policy
@@ -104,8 +119,8 @@ data (e.g. multiple writers on a shared schema). When used, name it
 
 ```sql
 create table orders (
-    id              bigint comment '주문 ID'
-  , user_id         bigint not null comment '주문자 [→ users.id]'
+    id              bigint unsigned comment '주문 ID'
+  , user_id         bigint unsigned not null comment '주문자 [→ users.id]'
   , order_date      date not null comment '주문 일자'
   , total_amount    decimal(10, 2) comment '총 주문 금액'
   , status          varchar(20) not null default 'pending' comment '주문 상태'
@@ -115,7 +130,7 @@ create table orders (
   , modified_by     varchar(50) not null comment '수정자'
   , modified_at     timestamp not null default current_timestamp comment '수정 일시'
   , constraint pk_orders primary key (id)
-) comment '주문';
+) comment '주문' default charset=utf8mb4 collate=utf8mb4_general_ci;
 
 -- Suggested indexes:
 -- create unique index udx_orders_01 on orders (user_id, order_date);

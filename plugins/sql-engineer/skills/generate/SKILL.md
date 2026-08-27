@@ -70,7 +70,8 @@ Constraint and index names use `{prefix}{table}_{nn}` numbering:
 - [ ] Vendor confirmed (or evident from context)
 - [ ] Lowercase, leading commas, right-aligned clauses
 - [ ] Explicit `join`, no `select *`
-- [ ] DDL: `bigint id` PK + four audit columns
+- [ ] DDL: `bigint` `id` PK + four audit columns (MySQL/MariaDB: `bigint unsigned`)
+- [ ] DDL (MySQL/MariaDB): `default charset=utf8mb4 collate=utf8mb4_general_ci` on every table
 - [ ] DDL: every table and column has a clear, concise comment
 - [ ] `varchar` for status values (no `enum`), `bit` for booleans
 - [ ] `_at` for datetime columns, `_date` for date columns
