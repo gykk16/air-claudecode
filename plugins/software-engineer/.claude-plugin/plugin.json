@@ -1,0 +1,11 @@
+{
+  "name": "software-engineer",
+  "version": "0.1.0",
+  "description": "Engineering workflow for Kotlin, Java, and Spring — implementation, test generation, and code review agents with a quality-gated super-engineer pipeline",
+  "author": {
+    "name": "youngkwang",
+    "email": "gykk16@gmail.com"
+  },
+  "license": "MIT",
+  "keywords": ["java", "kotlin", "spring", "clean-code", "test", "code-review", "workflow"]
+}

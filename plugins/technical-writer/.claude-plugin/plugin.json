@@ -1,0 +1,11 @@
+{
+  "name": "technical-writer",
+  "version": "0.1.0",
+  "description": "Technical documentation writing, review, and sentence polishing based on the Toss technical writing guide",
+  "author": {
+    "name": "youngkwang",
+    "email": "gykk16@gmail.com"
+  },
+  "license": "CC-BY-NC-SA-4.0",
+  "keywords": ["technical-writing", "documentation", "docs", "korean"]
+}

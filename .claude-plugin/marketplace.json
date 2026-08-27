@@ -2,10 +2,44 @@
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
   "name": "air-claudecode",
   "version": "0.1.0",
-  "description": "Lightweight skill-sharing plugin for Claude Code teams. Zero dependencies, zero config.",
+  "description": "Lightweight plugin marketplace for Claude Code teams — engineering workflow, technical writing, and SQL. Zero dependencies, zero config.",
   "owner": {
     "name": "youngkwang",
     "email": "gykk16@gmail.com"
   },
-  "plugins": []
+  "plugins": [
+    {
+      "name": "software-engineer",
+      "description": "Engineering workflow for Kotlin, Java, and Spring — implementation, test generation, and code review agents with a quality-gated super-engineer pipeline",
+      "version": "0.1.0",
+      "author": {
+        "name": "youngkwang",
+        "email": "gykk16@gmail.com"
+      },
+      "source": "./plugins/software-engineer",
+      "category": "development"
+    },
+    {
+      "name": "technical-writer",
+      "description": "Technical documentation writing, review, and sentence polishing based on the Toss technical writing guide",
+      "version": "0.1.0",
+      "author": {
+        "name": "youngkwang",
+        "email": "gykk16@gmail.com"
+      },
+      "source": "./plugins/technical-writer",
+      "category": "documentation"
+    },
+    {
+      "name": "sql-engineer",
+      "description": "Vendor-aware SQL generation (DDL/DML) with strict formatting, naming, and policy rules",
+      "version": "0.1.0",
+      "author": {
+        "name": "youngkwang",
+        "email": "gykk16@gmail.com"
+      },
+      "source": "./plugins/sql-engineer",
+      "category": "database"
+    }
+  ]
 }

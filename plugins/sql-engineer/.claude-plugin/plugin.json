@@ -1,0 +1,11 @@
+{
+  "name": "sql-engineer",
+  "version": "0.1.0",
+  "description": "Vendor-aware SQL generation (DDL/DML) with strict formatting, naming, and policy rules",
+  "author": {
+    "name": "youngkwang",
+    "email": "gykk16@gmail.com"
+  },
+  "license": "MIT",
+  "keywords": ["sql", "ddl", "dml", "database", "schema"]
+}

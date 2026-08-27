@@ -1,47 +1,70 @@
 # air-claudecode
 
-Lightweight skill-sharing plugin for Claude Code teams. Zero dependencies, zero config.
+Lightweight plugin marketplace for Claude Code teams — engineering workflow,
+technical writing, and SQL. Zero dependencies, zero config.
 
 Add this repository as a marketplace to install its plugins.
 
 ## Plugins
 
-None yet.
+| Plugin | Commands | Description |
+| --- | --- | --- |
+| `software-engineer` | `develop`, `write-tests`, `review`, `super-engineer` | Engineering workflow for Kotlin, Java, and Spring — implementation, test generation, and code review agents |
+| `technical-writer` | `write`, `review`, `polish` | Technical documentation writing, review, and sentence polishing based on the Toss technical writing guide |
+| `sql-engineer` | `generate` | Vendor-aware SQL generation (DDL/DML) with strict formatting, naming, and policy rules |
+
+Commands are invoked as `/<plugin>:<command>`, e.g. `/sql-engineer:generate`.
+
+The `software-engineer` plugin runs each phase individually, or the whole
+quality-gated pipeline (develop → test → review → fix until approved) at once:
+
+```
+# individual phases
+/software-engineer:develop <task>
+/software-engineer:write-tests <target>
+/software-engineer:review
+
+# full pipeline
+/software-engineer:super-engineer <task>
+```
 
 ## Installation
 
-```bash
-/plugin marketplace add <org>/air-claudecode
-/plugin install <plugin-name>@air-claudecode
-```
-
-## Development
-
-Each plugin lives under `plugins/<plugin-name>/`:
-
-```
-plugins/<plugin-name>/
-├── .claude-plugin/
-│   └── plugin.json        # manifest only — nothing else goes here
-└── skills/                # components live at the plugin root
-    └── <skill-name>/
-        └── SKILL.md
-```
-
-To add a new plugin:
-
-1. Create `plugins/<plugin-name>/.claude-plugin/plugin.json` (`name` must be kebab-case)
-2. Add components (`skills/`, `agents/`, `hooks/`, ...) at the plugin root
-3. Register the plugin in `.claude-plugin/marketplace.json`
-4. Validate with `claude plugin validate .`
-
-To test locally:
+Add the marketplace once, then install the plugins you need:
 
 ```bash
-claude --plugin-dir ./plugins/<plugin-name>
+# 1. Add the marketplace
+/plugin marketplace add gykk16/air-claudecode
+
+# or from a local clone
+/plugin marketplace add /path/to/air-claudecode
+
+# 2. Install plugins
+/plugin install software-engineer@air-claudecode
+/plugin install technical-writer@air-claudecode
+/plugin install sql-engineer@air-claudecode
 ```
 
-After editing a skill mid-session, reload with `/reload-plugins`.
+Check what's installed with `/plugin list`, and toggle plugins with
+`/plugin enable|disable <plugin-name>@air-claudecode`.
+
+## Update
+
+```bash
+# Refresh the marketplace catalog to the latest commit
+/plugin marketplace update air-claudecode
+```
+
+Installed plugins follow the refreshed catalog. Auto-update is disabled by
+default for custom marketplaces — to turn it on, open `/plugin`, go to the
+Marketplaces tab, select `air-claudecode`, and enable auto-update.
+
+## Uninstall
+
+```bash
+/plugin uninstall <plugin-name>@air-claudecode
+/plugin marketplace remove air-claudecode
+```
 
 ## References
 
